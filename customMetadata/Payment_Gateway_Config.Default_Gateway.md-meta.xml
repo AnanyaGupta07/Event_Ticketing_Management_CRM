@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Default Gateway</label>
+    <protected>false</protected>
+    <values>
+        <field>Environment__c</field>
+        <value xsi:type="xsd:string">Sandbox</value>
+    </values>
+    <values>
+        <field>Gateway_Provider__c</field>
+        <value xsi:type="xsd:string">Simulated_UPI</value>
+    </values>
+    <values>
+        <field>Merchant_Key_Id__c</field>
+        <value xsi:type="xsd:string">rzp_test_placeholder_key</value>
+    </values>
+    <values>
+        <field>Merchant_Secret__c</field>
+        <value xsi:type="xsd:string">mock_secret_placeholder</value>
+    </values>
+    <values>
+        <field>Webhook_Secret__c</field>
+        <value xsi:type="xsd:string">mock_wh_secret_placeholder</value>
+    </values>
+    <values>
+        <field>UPI_VPA__c</field>
+        <value xsi:type="xsd:string">eventmgmt@upi</value>
+    </values>
+    <values>
+        <field>Auto_Verify_Seconds__c</field>
+        <value xsi:type="xsd:double">10.0</value>
+    </values>
+</CustomMetadata>

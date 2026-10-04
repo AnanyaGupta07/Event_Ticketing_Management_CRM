@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <brand>
+        <headerColor>#1B96FF</headerColor>
+        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+    </brand>
+    <description>Enterprise Event Management application for organizers and managers to create events, manage venues, review budgets, and monitor attendance.</description>
+    <formFactors>Large</formFactors>
+    <formFactors>Small</formFactors>
+    <label>Event Management</label>
+    <navType>Standard</navType>
+    <tabs>Organizer_Dashboard</tabs>
+    <tabs>Event__c</tabs>
+    <tabs>Venue__c</tabs>
+    <tabs>Speaker__c</tabs>
+    <tabs>Registration__c</tabs>
+    <tabs>Attendee__c</tabs>
+    <tabs>Payment__c</tabs>
+    <tabs>standard-report</tabs>
+    <tabs>standard-Dashboard</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>

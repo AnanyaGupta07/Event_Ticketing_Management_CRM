@@ -1,0 +1,148 @@
+<template>
+    <div class="payment-card slds-card slds-p-around_large">
+
+        <!-- Step 1: Entry Payment Screen -->
+        <template if:true={isEntryStep}>
+            <div class="slds-text-align_center slds-m-bottom_medium">
+                <h2 class="payment-title slds-text-heading_medium slds-m-bottom_x-small">Complete Your Payment</h2>
+                <p class="payment-subtitle slds-text-color_weak">Scan the QR code to complete your payment.</p>
+            </div>
+
+            <!-- Amount display badge -->
+            <div class="amount-container slds-m-bottom_medium slds-text-align_center">
+                <span class="amount-label slds-text-title_bold slds-m-right_xx-small">Total Amount:</span>
+                <span class="amount-value">{formattedAmount}</span>
+            </div>
+
+            <!-- Realistic QR Code Container -->
+            <div class="qr-container slds-text-align_center slds-m-vertical_medium">
+                <div class="qr-box">
+                    <svg class="qr-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Background -->
+                        <rect width="160" height="160" fill="#FFFFFF" rx="8" />
+
+                        <!-- Top-Left Finder Pattern -->
+                        <rect x="12" y="12" width="42" height="42" fill="#1E293B" rx="4" />
+                        <rect x="18" y="18" width="30" height="30" fill="#FFFFFF" rx="2" />
+                        <rect x="24" y="24" width="18" height="18" fill="#1E293B" rx="1" />
+
+                        <!-- Top-Right Finder Pattern -->
+                        <rect x="106" y="12" width="42" height="42" fill="#1E293B" rx="4" />
+                        <rect x="112" y="18" width="30" height="30" fill="#FFFFFF" rx="2" />
+                        <rect x="118" y="24" width="18" height="18" fill="#1E293B" rx="1" />
+
+                        <!-- Bottom-Left Finder Pattern -->
+                        <rect x="12" y="106" width="42" height="42" fill="#1E293B" rx="4" />
+                        <rect x="18" y="112" width="30" height="30" fill="#FFFFFF" rx="2" />
+                        <rect x="24" y="118" width="18" height="18" fill="#1E293B" rx="1" />
+
+                        <!-- Timing Patterns -->
+                        <rect x="60" y="24" width="6" height="6" fill="#1E293B" />
+                        <rect x="72" y="24" width="6" height="6" fill="#1E293B" />
+                        <rect x="84" y="24" width="6" height="6" fill="#1E293B" />
+                        <rect x="96" y="24" width="6" height="6" fill="#1E293B" />
+                        <rect x="24" y="60" width="6" height="6" fill="#1E293B" />
+                        <rect x="24" y="72" width="6" height="6" fill="#1E293B" />
+                        <rect x="24" y="84" width="6" height="6" fill="#1E293B" />
+                        <rect x="24" y="96" width="6" height="6" fill="#1E293B" />
+
+                        <!-- Dynamic Data Modules rendered from sessionRef -->
+                        <template for:each={qrModules} for:item="mod">
+                            <rect key={mod.id} x={mod.x} y={mod.y} width="5" height="5" fill="#1E293B" rx="0.5" />
+                        </template>
+                    </svg>
+                </div>
+                <div class="reference-code slds-text-body_small slds-m-top_small slds-text-color_weak">
+                    Ref: <code>{sessionRef}</code>
+                </div>
+            </div>
+
+            <!-- Confirmation Checkbox -->
+            <div class="checkbox-container slds-m-top_large slds-p-around_small slds-box slds-theme_shade">
+                <lightning-input 
+                    type="checkbox" 
+                    label="I have completed the payment" 
+                    checked={isPaymentConfirmedChecked}
+                    onchange={handleCheckboxChange}
+                    class="payment-checkbox">
+                </lightning-input>
+            </div>
+
+            <!-- Action Button -->
+            <div class="slds-m-top_large slds-text-align_center">
+                <lightning-button 
+                    variant="brand" 
+                    label="Next" 
+                    disabled={isNextDisabled}
+                    onclick={handleNextClick}
+                    class="slds-button_stretch payment-action-btn">
+                </lightning-button>
+            </div>
+        </template>
+
+        <!-- Step 2: Payment Verification Screen (10-Second Countdown) -->
+        <template if:true={isVerifyingStep}>
+            <div class="verifying-container slds-text-align_center slds-p-vertical_xx-large">
+                <h2 class="verifying-title slds-text-heading_medium slds-m-bottom_x-small">Verifying Payment</h2>
+                <p class="verifying-subtitle slds-text-color_weak slds-m-bottom_large">
+                    Please wait while we confirm your payment.
+                </p>
+
+                <!-- Animated Countdown Circle -->
+                <div class="countdown-wrapper slds-m-vertical_large">
+                    <div class="countdown-circle">
+                        <span class="countdown-number">{countdownSeconds}</span>
+                        <span class="countdown-unit">seconds</span>
+                    </div>
+                    <div class="countdown-progress-ring">
+                        <lightning-progress-ring 
+                            value={countdownProgressPercent} 
+                            size="large" 
+                            variant="active-step">
+                        </lightning-progress-ring>
+                    </div>
+                </div>
+
+                <div class="verification-notice slds-text-body_small slds-text-color_weak slds-m-top_medium">
+                    Do not close or refresh this window while verification is in progress.
+                </div>
+            </div>
+        </template>
+
+        <!-- Step 3: Confirmed State -->
+        <template if:true={isConfirmedStep}>
+            <div class="confirmed-container slds-text-align_center slds-p-vertical_large">
+                <div class="success-icon-wrapper slds-m-bottom_medium">
+                    <lightning-icon 
+                        icon-name="utility:success" 
+                        variant="success" 
+                        size="large"
+                        alternative-text="Success">
+                    </lightning-icon>
+                </div>
+
+                <h2 class="confirmed-title slds-text-heading_large slds-m-bottom_x-small">Payment Confirmed!</h2>
+                <p class="confirmed-msg slds-text-body_regular slds-text-color_weak slds-m-bottom_xx-small">
+                    Your payment has been successfully verified.
+                </p>
+                <p class="confirmed-submsg slds-text-heading_small slds-m-bottom_large slds-text-color_success">
+                    Your registration is confirmed.
+                </p>
+
+                <div class="confirmed-details slds-box slds-theme_shade slds-m-bottom_large slds-text-align_left">
+                    <p class="slds-m-bottom_xx-small"><strong>Transaction Ref:</strong> {sessionRef}</p>
+                    <p class="slds-m-bottom_xx-small"><strong>Amount Paid:</strong> {formattedAmount}</p>
+                    <p class="slds-m-bottom_none"><strong>Payment Method:</strong> UPI (Verified)</p>
+                </div>
+
+                <lightning-button 
+                    variant="brand" 
+                    label="Done" 
+                    onclick={handleDoneClick}
+                    class="slds-button_stretch payment-action-btn">
+                </lightning-button>
+            </div>
+        </template>
+
+    </div>
+</template>

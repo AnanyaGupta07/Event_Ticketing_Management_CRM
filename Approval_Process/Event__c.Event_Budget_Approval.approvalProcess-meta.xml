@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApprovalProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <allowRecall>true</allowRecall>
+    <allowedSubmitters>
+        <type>owner</type>
+    </allowedSubmitters>
+    <showApprovalHistory>true</showApprovalHistory>
+    <label>Event Budget Approval Process</label>
+    <processOrder>1</processOrder>
+    <recordEditability>AdminOnly</recordEditability>
+    <description>Single-step approval process for Event budget review, routing events whose proposed budget exceeds the threshold to the Event Manager role.</description>
+    
+    <!-- Entry Criteria: Approval Status is Unset or Draft -->
+    <entryCriteria>
+        <formula>ISBLANK(TEXT(Approval_Status__c)) || ISPICKVAL(Approval_Status__c, &quot;Draft&quot;)</formula>
+    </entryCriteria>
+
+    <!-- Initial Submission Actions -->
+    <initialSubmissionActions>
+        <action>
+            <name>Set_Status_Pending_Approval</name>
+            <type>FieldUpdate</type>
+        </action>
+    </initialSubmissionActions>
+
+    <!-- Approval Step 1: Assigned to Event Manager Role (prevents self-approval) -->
+    <approvalStep>
+        <allowDelegate>true</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <type>adhoc</type>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <description>Event Manager reviews event details and proposed budget.</description>
+        <label>Manager Review</label>
+        <name>Manager_Review</name>
+        <rejectBehavior>
+            <type>RejectRequest</type>
+        </rejectBehavior>
+    </approvalStep>
+
+    <!-- Final Approval Actions: Sets Approval_Status__c to 'Approved' -->
+    <finalApprovalActions>
+        <action>
+            <name>Set_Status_Approved</name>
+            <type>FieldUpdate</type>
+        </action>
+    </finalApprovalActions>
+
+    <!-- Final Rejection Actions: Sets Approval_Status__c to 'Rejected' (VR requires Rejection_Reason__c) -->
+    <finalRejectionActions>
+        <action>
+            <name>Set_Status_Rejected</name>
+            <type>FieldUpdate</type>
+        </action>
+    </finalRejectionActions>
+
+    <!-- Recall Actions: Resets Approval_Status__c back to 'Draft' -->
+    <recallActions>
+        <action>
+            <name>Set_Status_Draft</name>
+            <type>FieldUpdate</type>
+        </action>
+    </recallActions>
+</ApprovalProcess>

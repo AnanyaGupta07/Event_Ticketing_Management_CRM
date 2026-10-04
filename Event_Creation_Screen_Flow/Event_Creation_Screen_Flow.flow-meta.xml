@@ -1,0 +1,755 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>61.0</apiVersion>
+    <description>Screen Flow for creating an Event along with dynamic Ticket Types, evaluating approval threshold, and initiating approval if required.</description>
+    <environments>Default</environments>
+    <interviewLabel>Event Creation Screen Flow {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Event Creation Screen Flow</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>Flow</processType>
+    <status>Active</status>
+
+    <!-- Variables -->
+    <variables>
+        <name>varVenueCapacity</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+    </variables>
+    <variables>
+        <name>varRunningQuotaTotal</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+    </variables>
+    <variables>
+        <name>varTicketTypeWrappers</name>
+        <apexClass>TicketTypeWrapper</apexClass>
+        <dataType>Apex</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>varTicketTypesToCreate</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Ticket_Type__c</objectType>
+    </variables>
+    <variables>
+        <name>varSingleTicketType</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Ticket_Type__c</objectType>
+    </variables>
+    <variables>
+        <name>varEventId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <name>newEventId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <name>outcome</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <name>varThreshold</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Approval_Settings__mdt</objectType>
+    </variables>
+
+    <!-- Start Element -->
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Basic_Details</targetReference>
+        </connector>
+    </start>
+
+    <!-- 1. Screen: Basic_Details -->
+    <screens>
+        <name>Basic_Details</name>
+        <label>Basic Details</label>
+        <locationX>176</locationX>
+        <locationY>134</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Date_Time</targetReference>
+        </connector>
+        <fields>
+            <name>Event_Name</name>
+            <dataType>String</dataType>
+            <fieldText>Event Name</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <fields>
+            <name>Description</name>
+            <fieldText>Description</fieldText>
+            <fieldType>LargeTextArea</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>Category</name>
+            <choiceReferences>Category_Conference</choiceReferences>
+            <choiceReferences>Category_Workshop</choiceReferences>
+            <choiceReferences>Category_Webinar</choiceReferences>
+            <choiceReferences>Category_Meetup</choiceReferences>
+            <dataType>String</dataType>
+            <fieldText>Category</fieldText>
+            <fieldType>DropdownBox</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+
+    <choices>
+        <name>Category_Conference</name>
+        <choiceText>Conference</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Conference</stringValue>
+        </value>
+    </choices>
+    <choices>
+        <name>Category_Workshop</name>
+        <choiceText>Workshop</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Workshop</stringValue>
+        </value>
+    </choices>
+    <choices>
+        <name>Category_Webinar</name>
+        <choiceText>Webinar</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Webinar</stringValue>
+        </value>
+    </choices>
+    <choices>
+        <name>Category_Meetup</name>
+        <choiceText>Meetup</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Meetup</stringValue>
+        </value>
+    </choices>
+
+    <!-- 2. Screen: Date_Time -->
+    <screens>
+        <name>Date_Time</name>
+        <label>Date &amp; Time</label>
+        <locationX>176</locationX>
+        <locationY>242</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Venue_Selection</targetReference>
+        </connector>
+        <fields>
+            <name>Start_Date_Time</name>
+            <dataType>DateTime</dataType>
+            <fieldText>Start Date/Time</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <fields>
+            <name>End_Date_Time</name>
+            <dataType>DateTime</dataType>
+            <fieldText>End Date/Time</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>true</isRequired>
+            <validationRule>
+                <errorMessage>End Date/Time must be strictly after Start Date/Time.</errorMessage>
+                <formulaExpression>{!End_Date_Time} &gt; {!Start_Date_Time}</formulaExpression>
+            </validationRule>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+
+    <!-- 3. Screen: Venue_Selection -->
+    <screens>
+        <name>Venue_Selection</name>
+        <label>Select Venue</label>
+        <locationX>176</locationX>
+        <locationY>350</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Get_Selected_Venue_Capacity</targetReference>
+        </connector>
+        <fields>
+            <name>Venue_Lookup</name>
+            <extensionName>flowruntime:lookup</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>fieldApiName</name>
+                <value>
+                    <stringValue>Venue__c</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>label</name>
+                <value>
+                    <stringValue>Venue</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>objectApiName</name>
+                <value>
+                    <stringValue>Event__c</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>required</name>
+                <value>
+                    <booleanValue>true</booleanValue>
+                </value>
+            </inputParameters>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+
+    <!-- 4. Get Records: Get_Selected_Venue_Capacity -->
+    <recordLookups>
+        <name>Get_Selected_Venue_Capacity</name>
+        <label>Get Selected Venue Capacity</label>
+        <locationX>176</locationX>
+        <locationY>458</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Add_Ticket_Types_Screen</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Venue_Lookup.recordId</elementReference>
+            </value>
+        </filters>
+        <object>Venue__c</object>
+        <outputAssignments>
+            <assignToReference>varVenueCapacity</assignToReference>
+            <field>Venue_Capacity__c</field>
+        </outputAssignments>
+    </recordLookups>
+
+    <!-- 5. Screen: Add_Ticket_Types_Screen (embeds ticketTypeCollector LWC) -->
+    <screens>
+        <name>Add_Ticket_Types_Screen</name>
+        <label>Add Ticket Types</label>
+        <locationX>176</locationX>
+        <locationY>566</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Proposed_Budget_Screen</targetReference>
+        </connector>
+        <fields>
+            <name>Ticket_Type_Collector_Component</name>
+            <extensionName>c:ticketTypeCollector</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>venueCapacity</name>
+                <value>
+                    <elementReference>varVenueCapacity</elementReference>
+                </value>
+            </inputParameters>
+            <isRequired>true</isRequired>
+            <outputParameters>
+                <assignToReference>varTicketTypeWrappers</assignToReference>
+                <name>ticketTypes</name>
+            </outputParameters>
+            <outputParameters>
+                <assignToReference>varRunningQuotaTotal</assignToReference>
+                <name>runningQuotaTotal</name>
+            </outputParameters>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+
+    <!-- 6. Screen: Proposed_Budget_Screen -->
+    <screens>
+        <name>Proposed_Budget_Screen</name>
+        <label>Proposed Budget</label>
+        <locationX>176</locationX>
+        <locationY>674</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Review_Screen</targetReference>
+        </connector>
+        <fields>
+            <name>Proposed_Budget</name>
+            <dataType>Currency</dataType>
+            <fieldText>Proposed Budget</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>true</isRequired>
+            <scale>2</scale>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+
+    <!-- 7. Screen: Review_Screen -->
+    <screens>
+        <name>Review_Screen</name>
+        <label>Review &amp; Confirm</label>
+        <locationX>176</locationX>
+        <locationY>782</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Create_Event</targetReference>
+        </connector>
+        <fields>
+            <name>Review_Header</name>
+            <fieldText>&lt;h3&gt;&lt;b&gt;Review Event Details&lt;/b&gt;&lt;/h3&gt;&lt;p&gt;Please review the information below before submitting.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>Review_Event_Details</name>
+            <fieldText>&lt;p&gt;&lt;b&gt;Event Name:&lt;/b&gt; {!Event_Name}&lt;/p&gt;&lt;p&gt;&lt;b&gt;Category:&lt;/b&gt; {!Category}&lt;/p&gt;&lt;p&gt;&lt;b&gt;Start Date/Time:&lt;/b&gt; {!Start_Date_Time}&lt;/p&gt;&lt;p&gt;&lt;b&gt;End Date/Time:&lt;/b&gt; {!End_Date_Time}&lt;/p&gt;&lt;p&gt;&lt;b&gt;Proposed Budget:&lt;/b&gt; ₹{!Proposed_Budget}&lt;/p&gt;&lt;p&gt;&lt;b&gt;Total Ticket Quota:&lt;/b&gt; {!varRunningQuotaTotal} / {!varVenueCapacity}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+
+    <!-- 8. Create Records: Create_Event -->
+    <recordCreates>
+        <name>Create_Event</name>
+        <label>Create Event</label>
+        <locationX>176</locationX>
+        <locationY>890</locationY>
+        <assignRecordIdToReference>varEventId</assignRecordIdToReference>
+        <connector>
+            <targetReference>Loop_Ticket_Type_Wrappers</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Creation_Failed_Screen</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>Name</field>
+            <value>
+                <elementReference>Event_Name</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description__c</field>
+            <value>
+                <elementReference>Description</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Category__c</field>
+            <value>
+                <elementReference>Category</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Start_Date_Time__c</field>
+            <value>
+                <elementReference>Start_Date_Time</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>End_Date_Time__c</field>
+            <value>
+                <elementReference>End_Date_Time</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Venue__c</field>
+            <value>
+                <elementReference>Venue_Lookup.recordId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Organizer__c</field>
+            <value>
+                <elementReference>$User.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Proposed_Budget__c</field>
+            <value>
+                <elementReference>Proposed_Budget</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Approval_Status__c</field>
+            <value>
+                <stringValue>Draft</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Publication_Status__c</field>
+            <value>
+                <stringValue>Unpublished</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Registration_Status__c</field>
+            <value>
+                <stringValue>Not Open</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Event__c</object>
+    </recordCreates>
+
+    <!-- 9. Loop over varTicketTypeWrappers -->
+    <loops>
+        <name>Loop_Ticket_Type_Wrappers</name>
+        <label>Loop Ticket Type Wrappers</label>
+        <locationX>176</locationX>
+        <locationY>998</locationY>
+        <collectionReference>varTicketTypeWrappers</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Assign_Single_Ticket_Type</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Create_Ticket_Types</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+
+    <!-- 9a. Assign Single Ticket Type -->
+    <assignments>
+        <name>Assign_Single_Ticket_Type</name>
+        <label>Assign Single Ticket Type</label>
+        <locationX>264</locationX>
+        <locationY>1106</locationY>
+        <assignmentItems>
+            <assignToReference>varSingleTicketType.Name</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Ticket_Type_Wrappers.name</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSingleTicketType.Price__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Ticket_Type_Wrappers.price</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSingleTicketType.Quota__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Ticket_Type_Wrappers.quota</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSingleTicketType.Description__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Ticket_Type_Wrappers.description</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSingleTicketType.Event__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>varEventId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varSingleTicketType.Status__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Available</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Add_To_Ticket_Types_List</targetReference>
+        </connector>
+    </assignments>
+
+    <!-- 9b. Add to Collection -->
+    <assignments>
+        <name>Add_To_Ticket_Types_List</name>
+        <label>Add To Ticket Types List</label>
+        <locationX>264</locationX>
+        <locationY>1214</locationY>
+        <assignmentItems>
+            <assignToReference>varTicketTypesToCreate</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>varSingleTicketType</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Ticket_Type_Wrappers</targetReference>
+        </connector>
+    </assignments>
+
+    <!-- 10. Create Records: Create_Ticket_Types (Bulk) -->
+    <recordCreates>
+        <name>Create_Ticket_Types</name>
+        <label>Create Ticket Types</label>
+        <locationX>176</locationX>
+        <locationY>1406</locationY>
+        <connector>
+            <targetReference>Get_Approval_Threshold</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Ticket_Type_Creation_Failed_Screen</targetReference>
+        </faultConnector>
+        <inputReference>varTicketTypesToCreate</inputReference>
+    </recordCreates>
+
+    <!-- 11. Get Records: Get_Approval_Threshold -->
+    <recordLookups>
+        <name>Get_Approval_Threshold</name>
+        <label>Get Approval Threshold</label>
+        <locationX>176</locationX>
+        <locationY>1514</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Budget_Exceeds_Threshold</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Default_Threshold</stringValue>
+            </value>
+        </filters>
+        <object>Approval_Settings__mdt</object>
+        <outputAssignments>
+            <assignToReference>varThreshold.Budget_Threshold__c</assignToReference>
+            <field>Budget_Threshold__c</field>
+        </outputAssignments>
+    </recordLookups>
+
+    <!-- 12. Decision: Budget_Exceeds_Threshold -->
+    <decisions>
+        <name>Budget_Exceeds_Threshold</name>
+        <label>Budget Exceeds Threshold?</label>
+        <locationX>176</locationX>
+        <locationY>1622</locationY>
+        <defaultConnector>
+            <targetReference>Set_Approved</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Auto Approved</defaultConnectorLabel>
+        <rules>
+            <name>Requires_Approval</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Proposed_Budget</leftValueReference>
+                <operator>GreaterThan</operator>
+                <rightValue>
+                    <elementReference>varThreshold.Budget_Threshold__c</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Submit_For_Approval_Action</targetReference>
+            </connector>
+            <label>Requires Approval</label>
+        </rules>
+    </decisions>
+
+    <!-- 13a. Update Records: Set_Approved (Auto Approved path) -->
+    <recordUpdates>
+        <name>Set_Approved</name>
+        <label>Set Approved</label>
+        <locationX>264</locationX>
+        <locationY>1730</locationY>
+        <connector>
+            <targetReference>Set_AutoApproved_Outcome</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>varEventId</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Approval_Status__c</field>
+            <value>
+                <stringValue>Approved</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Event__c</object>
+    </recordUpdates>
+
+    <assignments>
+        <name>Set_AutoApproved_Outcome</name>
+        <label>Set AutoApproved Outcome</label>
+        <locationX>264</locationX>
+        <locationY>1838</locationY>
+        <assignmentItems>
+            <assignToReference>outcome</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>AutoApproved</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>newEventId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>varEventId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Event_Submitted_Screen</targetReference>
+        </connector>
+    </assignments>
+
+    <!-- 13b. Action: Submit_For_Approval_Action -->
+    <actionCalls>
+        <name>Submit_For_Approval_Action</name>
+        <label>Submit For Approval</label>
+        <locationX>88</locationX>
+        <locationY>1730</locationY>
+        <actionName>submit</actionName>
+        <actionType>submit</actionType>
+        <connector>
+            <targetReference>Set_PendingApproval_Outcome</targetReference>
+        </connector>
+        <inputParameters>
+            <name>objectId</name>
+            <value>
+                <elementReference>varEventId</elementReference>
+            </value>
+        </inputParameters>
+    </actionCalls>
+
+    <assignments>
+        <name>Set_PendingApproval_Outcome</name>
+        <label>Set PendingApproval Outcome</label>
+        <locationX>88</locationX>
+        <locationY>1838</locationY>
+        <assignmentItems>
+            <assignToReference>outcome</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>PendingApproval</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>newEventId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>varEventId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Event_Submitted_Screen</targetReference>
+        </connector>
+    </assignments>
+
+    <!-- 14. Screen: Event_Submitted_Screen -->
+    <screens>
+        <name>Event_Submitted_Screen</name>
+        <label>Event Created</label>
+        <locationX>176</locationX>
+        <locationY>2030</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>Success_Message</name>
+            <fieldText>&lt;h3 style=&quot;color:green;&quot;&gt;&lt;b&gt;Event Successfully Created!&lt;/b&gt;&lt;/h3&gt;&lt;p&gt;Status Outcome: &lt;b&gt;{!outcome}&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Click &lt;b&gt;Finish&lt;/b&gt; to return to your Organizer Dashboard.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+
+    <!-- Fault Screens -->
+    <screens>
+        <name>Creation_Failed_Screen</name>
+        <label>Creation Failed</label>
+        <locationX>440</locationX>
+        <locationY>998</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>Error_Message_Text</name>
+            <fieldText>&lt;h3 style=&quot;color:red;&quot;&gt;&lt;b&gt;Event Creation Failed&lt;/b&gt;&lt;/h3&gt;&lt;p&gt;{!$Flow.FaultMessage}&lt;/p&gt;&lt;p&gt;Please go back and verify your inputs.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+
+    <screens>
+        <name>Ticket_Type_Creation_Failed_Screen</name>
+        <label>Ticket Type Creation Failed</label>
+        <locationX>352</locationX>
+        <locationY>1514</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>Ticket_Error_Message_Text</name>
+            <fieldText>&lt;h3 style=&quot;color:red;&quot;&gt;&lt;b&gt;Ticket Type Creation Failed&lt;/b&gt;&lt;/h3&gt;&lt;p&gt;{!$Flow.FaultMessage}&lt;/p&gt;&lt;p&gt;Please adjust your ticket type quotas so they do not exceed venue capacity.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+</Flow>

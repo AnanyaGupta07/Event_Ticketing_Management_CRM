@@ -1,0 +1,154 @@
+<template>
+    <div class="slds-card">
+
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Refreshing" size="small"></lightning-spinner>
+        </template>
+
+        <!-- ============ LIST VIEW (existing dashboard, unchanged below the header) ============ -->
+        <template if:true={isListView}>
+
+            <!-- Header -->
+            <div class="slds-card__header slds-grid slds-grid_align-spread">
+                <h2 class="slds-text-heading_medium">My Events</h2>
+                <div>
+                    <lightning-button
+                        label="Refresh"
+                        icon-name="utility:refresh"
+                        onclick={handleRefresh}
+                        class="slds-m-right_x-small">
+                    </lightning-button>
+                    <lightning-button
+                        variant="brand"
+                        label="Create Event"
+                        icon-name="utility:add"
+                        onclick={handleCreateEvent}>
+                    </lightning-button>
+                </div>
+            </div>
+
+            <!-- Summary tiles -->
+            <div class="slds-card__body slds-card__body_inner">
+                <div class="slds-grid slds-gutters slds-wrap slds-m-bottom_medium">
+                    <div class="slds-col slds-size_1-of-3">
+                        <div class="slds-box slds-text-align_center">
+                            <p class="slds-text-heading_large">{totalEvents}</p>
+                            <p class="slds-text-body_small slds-text-color_weak">Total Events</p>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3">
+                        <div class="slds-box slds-text-align_center">
+                            <p class="slds-text-heading_large">{totalRegistrations}</p>
+                            <p class="slds-text-body_small slds-text-color_weak">Confirmed Registrations</p>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3">
+                        <div class="slds-box slds-text-align_center">
+                            <p class="slds-text-heading_large">{totalRevenueFormatted}</p>
+                            <p class="slds-text-body_small slds-text-color_weak">Total Revenue</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search + filters -->
+                <div class="slds-grid slds-gutters slds-wrap slds-m-bottom_medium slds-grid_vertical-align-end">
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input
+                            type="search"
+                            label="Search events"
+                            placeholder="Search by event name..."
+                            value={searchTerm}
+                            onchange={handleSearchChange}>
+                        </lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-combobox
+                            label="Approval status"
+                            value={statusFilter}
+                            options={statusOptions}
+                            onchange={handleStatusFilterChange}>
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-4">
+                        <div class="slds-button-group" role="group">
+                            <lightning-button
+                                variant={allButtonVariant}
+                                label="All"
+                                data-filter="all"
+                                onclick={handleTimeFilterClick}>
+                            </lightning-button>
+                            <lightning-button
+                                variant={upcomingButtonVariant}
+                                label="Upcoming"
+                                data-filter="upcoming"
+                                onclick={handleTimeFilterClick}>
+                            </lightning-button>
+                            <lightning-button
+                                variant={completedButtonVariant}
+                                label="Completed"
+                                data-filter="completed"
+                                onclick={handleTimeFilterClick}>
+                            </lightning-button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event list -->
+                <template if:false={hasEvents}>
+                    <p class="slds-text-color_weak slds-p-around_medium slds-text-align_center">
+                        No events match the current filters.
+                    </p>
+                </template>
+
+                <template for:each={filteredEvents} for:item="ev">
+                    <div key={ev.eventId} class="slds-box slds-m-bottom_small">
+                        <div class="slds-grid slds-grid_align-spread slds-wrap">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+                                <p class="slds-text-heading_small">{ev.eventName}</p>
+                                <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
+                                    {ev.startDateFormatted} · {ev.venueName}
+                                </p>
+                                <div class="slds-m-top_x-small">
+                                    <span class={ev.statusBadgeClass}>{ev.approvalStatus}</span>
+                                    <span class="slds-badge slds-m-left_x-small">{ev.publicationStatus}</span>
+                                    <span class="slds-badge slds-m-left_x-small">{ev.registrationStatus}</span>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-text-align_right">
+                                <p class="slds-text-body_small">
+                                    Seats: {ev.bookedSeats} / {ev.totalCapacity}
+                                    (<span>{ev.availableSeats}</span> left)
+                                </p>
+                                <p class="slds-text-body_small">Registrations: {ev.confirmedRegistrations}</p>
+                                <p class="slds-text-body_small slds-text-color_success">
+                                    Revenue: {ev.revenueFormatted}
+                                </p>
+                                <lightning-button
+                                    class="slds-m-top_x-small"
+                                    label="View"
+                                    data-event-id={ev.eventId}
+                                    onclick={handleViewEvent}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- ============ CREATE EVENT VIEW — embedded Event_Creation_Screen_Flow ============ -->
+        <template if:true={isCreateEventView}>
+            <div class="slds-card__header slds-grid slds-grid_align-spread">
+                <h2 class="slds-text-heading_medium">Create Event</h2>
+                <lightning-button label="Cancel" onclick={handleCancelCreateEvent}></lightning-button>
+            </div>
+            <div class="slds-card__body slds-card__body_inner">
+                <lightning-flow
+                    flow-api-name={createEventFlowApiName}
+                    onstatuschange={handleCreateEventFlowStatusChange}>
+                </lightning-flow>
+            </div>
+        </template>
+
+    </div>
+</template>

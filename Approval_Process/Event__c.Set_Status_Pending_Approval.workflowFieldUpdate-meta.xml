@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkflowFieldUpdate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Event__c.Set_Status_Pending_Approval</fullName>
+    <description>Updates Event Approval Status to Pending Approval upon submission.</description>
+    <field>Approval_Status__c</field>
+    <literalValue>Pending Approval</literalValue>
+    <name>Set Status Pending Approval</name>
+    <notifyAssignee>false</notifyAssignee>
+    <operation>Literal</operation>
+    <protected>false</protected>
+    <reevaluateOnChange>false</reevaluateOnChange>
+</WorkflowFieldUpdate>

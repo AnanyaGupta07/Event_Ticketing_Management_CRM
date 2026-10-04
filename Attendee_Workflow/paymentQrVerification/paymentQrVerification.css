@@ -1,0 +1,142 @@
+.payment-card {
+    max-width: 480px;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+}
+
+.payment-title {
+    color: #0F172A;
+    font-weight: 700;
+}
+
+.amount-container {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    padding: 10px 16px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.amount-label {
+    color: #64748B;
+}
+
+.amount-value {
+    color: #0284C7;
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.qr-box {
+    display: inline-block;
+    padding: 12px;
+    background: #FFFFFF;
+    border: 2px dashed #CBD5E1;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.qr-svg {
+    width: 170px;
+    height: 170px;
+    display: block;
+}
+
+.reference-code code {
+    background: #F1F5F9;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+.checkbox-container {
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+}
+
+.payment-checkbox {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.payment-action-btn {
+    --slds-c-button-brand-color-background: #0284C7;
+    --slds-c-button-brand-color-background-hover: #0369A1;
+    font-size: 1rem;
+    font-weight: 600;
+    height: 42px;
+}
+
+/* Countdown Styles */
+.countdown-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.countdown-circle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.countdown-number {
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: #0284C7;
+    line-height: 1;
+}
+
+.countdown-unit {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748B;
+    margin-top: 4px;
+}
+
+.countdown-progress-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Confirmed State Styles */
+.success-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto;
+    background: #ECFDF5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirmed-title {
+    color: #065F46;
+    font-weight: 800;
+}
+
+.confirmed-details {
+    background: #F8FAFC;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    font-size: 0.9rem;
+}
