@@ -1,0 +1,433 @@
+<template>
+    <div class="booking-portal-container slds-p-around_medium">
+
+        <!-- Header / Nav Banner -->
+        <header class="portal-header slds-m-bottom_large slds-p-around_medium">
+            <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-wrap">
+                <div class="slds-col">
+                    <h1 class="portal-main-title">Events &amp; Ticketing Portal</h1>
+                    <p class="portal-subtitle">Discover upcoming conferences, workshops, and manage your booked passes.</p>
+                </div>
+                <template if:false={isBrowseState}>
+                    <div class="slds-col slds-m-top_x-small">
+                        <lightning-button 
+                            label="Back to Browse" 
+                            icon-name="utility:back" 
+                            onclick={handleBackToBrowse}
+                            variant="neutral">
+                        </lightning-button>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Portal Navigation Tabs: Explore Events vs My Tickets -->
+            <div class="nav-tabs-bar">
+                <button class={eventsTabClass} onclick={handleTabClick} data-tab="events">
+                    <lightning-icon icon-name="utility:event" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                    Explore Events
+                </button>
+                <button class={ticketsTabClass} onclick={handleTabClick} data-tab="my-tickets">
+                    <lightning-icon icon-name="utility:identity" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                    My Tickets
+                    <span class="badge-count">{myTicketsCount}</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- TAB 1: EXPLORE EVENTS -->
+        <template if:true={isEventsTab}>
+
+            <!-- STATE 1: BROWSE (List of Published Events) -->
+            <template if:true={isBrowseState}>
+                <!-- Search & Filters -->
+                <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_large filter-bar slds-p-around_small">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+                        <lightning-input 
+                            type="search" 
+                            label="Search Events" 
+                            placeholder="Search by event name, venue, city..." 
+                            value={searchKey}
+                            onchange={handleSearchChange}
+                            variant="label-hidden">
+                        </lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                        <lightning-combobox 
+                            label="Category" 
+                            value={selectedCategory} 
+                            placeholder="All Categories" 
+                            options={categoryOptions} 
+                            onchange={handleCategoryChange}
+                            variant="label-hidden">
+                        </lightning-combobox>
+                    </div>
+                </div>
+
+                <!-- Loading Spinner -->
+                <template if:true={isLoading}>
+                    <div class="slds-p-around_xx-large slds-text-align_center">
+                        <lightning-spinner alternative-text="Loading Events" size="medium"></lightning-spinner>
+                    </div>
+                </template>
+
+                <!-- Events Grid -->
+                <template if:false={isLoading}>
+                    <template if:true={hasEvents}>
+                        <div class="slds-grid slds-wrap slds-gutters">
+                            <template for:each={filteredEvents} for:item="evt">
+                                <div key={evt.Id} class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-m-bottom_large">
+                                    <div class="event-card slds-card slds-p-around_medium">
+                                        <div class="event-card-header slds-m-bottom_small">
+                                            <span class="category-badge">{evt.Category__c}</span>
+                                            <span class="status-badge slds-float_right">Open</span>
+                                        </div>
+                                        <h2 class="event-card-title slds-text-heading_small slds-truncate" title={evt.Name}>{evt.Name}</h2>
+                                        <p class="event-venue-info slds-m-top_xx-small slds-text-color_weak slds-truncate">
+                                            <lightning-icon icon-name="utility:checkin" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                            {evt.Venue__r.Name} • {evt.Venue__r.City__c}, {evt.Venue__r.State__c}
+                                        </p>
+                                        <p class="event-date-info slds-m-top_xx-small slds-text-color_weak">
+                                            <lightning-icon icon-name="utility:event" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                            {evt.formattedStartDate}
+                                        </p>
+                                        
+                                        <div class="event-capacity-bar slds-m-vertical_small">
+                                            <div class="slds-grid slds-grid_align-spread slds-text-body_small slds-m-bottom_xx-small">
+                                                <span>Available Seats:</span>
+                                                <strong>{evt.Remaining_Capacity__c} / {evt.Total_Capacity__c}</strong>
+                                            </div>
+                                        </div>
+
+                                        <lightning-button 
+                                            variant="brand" 
+                                            label="View Tickets" 
+                                            data-id={evt.Id}
+                                            onclick={handleSelectEvent}
+                                            class="slds-button_stretch card-btn">
+                                        </lightning-button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                    <template if:false={hasEvents}>
+                        <div class="empty-state slds-card slds-p-around_xx-large slds-text-align_center">
+                            <lightning-icon icon-name="utility:event" size="large" class="slds-m-bottom_medium"></lightning-icon>
+                            <h3 class="slds-text-heading_medium">No Published Events Available</h3>
+                            <p class="slds-text-color_weak">Check back later for newly announced conferences and sessions.</p>
+                        </div>
+                    </template>
+                </template>
+            </template>
+
+            <!-- STATE 2: DETAIL (Event Information & Ticket Type Selection) -->
+            <template if:true={isDetailState}>
+                <div class="detail-container slds-card slds-p-around_large slds-m-bottom_large">
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_7-of-12">
+                            <div class="category-badge slds-m-bottom_small">{selectedEvent.Category__c}</div>
+                            <h2 class="detail-event-title slds-text-heading_large slds-m-bottom_small">{selectedEvent.Name}</h2>
+                            <p class="detail-description slds-text-body_regular slds-m-bottom_medium">{selectedEvent.Description__c}</p>
+                            
+                            <div class="detail-meta slds-box slds-theme_shade slds-m-bottom_medium">
+                                <p class="slds-m-bottom_xx-small">
+                                    <strong>Venue:</strong> {selectedEvent.Venue__r.Name} ({selectedEvent.Venue__r.Address__c}, {selectedEvent.Venue__r.City__c}, {selectedEvent.Venue__r.State__c})
+                                </p>
+                                <p class="slds-m-bottom_xx-small">
+                                    <strong>Date &amp; Time:</strong> {selectedEvent.formattedStartDate} to {selectedEvent.formattedEndDate}
+                                </p>
+                                <p class="slds-m-bottom_none">
+                                    <strong>Total Venue Capacity:</strong> {selectedEvent.Venue__r.Venue_Capacity__c}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Ticket Types Selection Panel -->
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12">
+                            <h3 class="slds-text-heading_medium slds-m-bottom_medium">Select Ticket Type</h3>
+                            <div class="ticket-types-list">
+                                <template for:each={ticketTypes} for:item="tt">
+                                    <div key={tt.Id} class={tt.cardClass} onclick={handleSelectTicketType} data-id={tt.Id}>
+                                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                                            <div>
+                                                <h4 class="ticket-title">{tt.Name}</h4>
+                                                <p class="ticket-quota slds-text-color_weak slds-text-body_small">
+                                                    {tt.Available_Seats__c} seats left of {tt.Quota__c}
+                                                </p>
+                                            </div>
+                                            <div class="slds-text-align_right">
+                                                <div class="ticket-price">₹{tt.Price__c}</div>
+                                                <span class={tt.statusBadgeClass}>{tt.Status__c}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- Ticket Counter -->
+                            <template if:true={selectedTicketType}>
+                                <div class="ticket-counter-card slds-box slds-m-top_medium slds-p-around_medium">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-m-bottom_small">
+                                        <div>
+                                            <span class="counter-label">Number of Tickets</span>
+                                            <p class="counter-subtext">Min: 1 • Remaining Available: {maxAllowedTickets}</p>
+                                        </div>
+                                        <div class="counter-controls">
+                                            <button 
+                                                class="counter-btn" 
+                                                onclick={handleDecrementTickets} 
+                                                disabled={isDecrementDisabled}
+                                                type="button"
+                                                title="Decrease tickets">
+                                                -
+                                            </button>
+                                            <span class="counter-display">{ticketQuantity}</span>
+                                            <button 
+                                                class="counter-btn" 
+                                                onclick={handleIncrementTickets} 
+                                                disabled={isIncrementDisabled}
+                                                type="button"
+                                                title="Increase tickets">
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="price-calc-summary slds-grid slds-grid_align-spread slds-p-top_x-small slds-border_top">
+                                        <span class="slds-text-body_regular">Total ({ticketQuantity} × ₹{selectedTicketType.Price__c}):</span>
+                                        <strong class="total-price-text">₹{totalCalculatedPrice}</strong>
+                                    </div>
+                                </div>
+
+                                <!-- Attendee Details Section -->
+                                <div class="attendees-section slds-m-top_large">
+                                    <div class="slds-m-bottom_small">
+                                        <h4 class="slds-text-title_bold slds-text-color_default">Attendee Details ({ticketQuantity} {attendeesPluralLabel})</h4>
+                                        <p class="slds-text-body_small slds-text-color_weak">Please fill in the information for each attendee.</p>
+                                    </div>
+
+                                    <template for:each={attendeeList} for:item="att">
+                                        <div key={att.index} class="attendee-card slds-box slds-m-bottom_small slds-p-around_small">
+                                            <div class="attendee-header slds-m-bottom_x-small">
+                                                <span class="attendee-tag">{att.label}</span>
+                                            </div>
+                                            <div class="slds-grid slds-wrap slds-gutters">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                                    <lightning-input 
+                                                        label="Full Name" 
+                                                        value={att.name} 
+                                                        data-index={att.index} 
+                                                        data-field="name" 
+                                                        onchange={handleAttendeeFieldChange} 
+                                                        required>
+                                                    </lightning-input>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                                    <lightning-input 
+                                                        type="email" 
+                                                        label="Email Address" 
+                                                        value={att.email} 
+                                                        data-index={att.index} 
+                                                        data-field="email" 
+                                                        onchange={handleAttendeeFieldChange} 
+                                                        required>
+                                                    </lightning-input>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                                    <lightning-input 
+                                                        type="tel" 
+                                                        label="Phone (10 Digits)" 
+                                                        max-length="10" 
+                                                        placeholder="9876543210" 
+                                                        value={att.phone} 
+                                                        data-index={att.index} 
+                                                        data-field="phone" 
+                                                        onchange={handleAttendeeFieldChange} 
+                                                        required>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <div class="slds-m-top_large">
+                                <lightning-button 
+                                    variant="brand" 
+                                    label={proceedButtonLabel} 
+                                    disabled={isProceedDisabled}
+                                    onclick={handleProceedToBooking}
+                                    class="slds-button_stretch proceed-btn">
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- STATE 3: FLOW (Embedded Screen Flow) -->
+            <template if:true={isFlowState}>
+                <div class="flow-container slds-card slds-p-around_large">
+                    <lightning-flow 
+                        flow-api-name="Event_Registration_Screen_Flow"
+                        flow-input-variables={flowInputVariables}
+                        onstatuschange={handleFlowStatusChange}>
+                    </lightning-flow>
+                </div>
+            </template>
+
+            <!-- STATE 4: PAYMENT (Embedded Payment QR Verification Child LWC) -->
+            <template if:true={isPaymentState}>
+                <div class="payment-wrapper">
+                    <c-payment-qr-verification 
+                        registration-id={newRegistrationId}
+                        amount={formattedTotalAmount}
+                        onpaymentconfirmed={handlePaymentConfirmed}>
+                    </c-payment-qr-verification>
+                </div>
+            </template>
+
+            <!-- STATE 5: SOLD OUT -->
+            <template if:true={isSoldOutState}>
+                <div class="sold-out-card slds-card slds-p-around_xx-large slds-text-align_center">
+                    <lightning-icon icon-name="utility:warning" variant="warning" size="large" class="slds-m-bottom_medium"></lightning-icon>
+                    <h2 class="slds-text-heading_large slds-m-bottom_small">Tickets Sold Out</h2>
+                    <p class="slds-text-color_weak slds-m-bottom_large">
+                        The requested ticket type is no longer available. Please select an alternative ticket tier or browse other events.
+                    </p>
+                    <lightning-button 
+                        variant="neutral" 
+                        label="Choose Another Ticket" 
+                        onclick={handleBackToDetail} 
+                        class="slds-m-right_small">
+                    </lightning-button>
+                    <lightning-button 
+                        variant="brand" 
+                        label="Browse All Events" 
+                        onclick={handleBackToBrowse}>
+                    </lightning-button>
+                </div>
+            </template>
+
+            <!-- STATE 6: SUCCESS -->
+            <template if:true={isSuccessState}>
+                <div class="success-card slds-card slds-p-around_xx-large slds-text-align_center">
+                    <div class="success-icon-wrap slds-m-bottom_medium">
+                        <lightning-icon icon-name="utility:success" variant="success" size="large"></lightning-icon>
+                    </div>
+                    <h2 class="success-title slds-text-heading_large slds-m-bottom_x-small">You're All Set!</h2>
+                    <p class="success-subtitle slds-text-body_regular slds-text-color_weak slds-m-bottom_large">
+                        Your event registration and payment have been confirmed for all attendees.
+                    </p>
+
+                    <div class="booking-receipt slds-box slds-theme_shade slds-m-bottom_large slds-text-align_left">
+                        <h3 class="slds-text-title_bold slds-m-bottom_small">Booking Summary</h3>
+                        <p class="slds-m-bottom_xx-small"><strong>Event:</strong> {selectedEvent.Name}</p>
+                        <p class="slds-m-bottom_xx-small"><strong>Venue:</strong> {selectedEvent.Venue__r.Name}</p>
+                        <p class="slds-m-bottom_xx-small"><strong>Ticket Type:</strong> {selectedTicketType.Name}</p>
+                        <p class="slds-m-bottom_xx-small"><strong>Passes Confirmed:</strong> {ticketQuantity}</p>
+                        <p class="slds-m-bottom_xx-small"><strong>Total Amount Paid:</strong> ₹{totalCalculatedPrice}</p>
+                        <template if:true={bookingGroupId}>
+                            <p class="slds-m-bottom_xx-small"><strong>Booking Reference:</strong> <code>{bookingGroupId}</code></p>
+                        </template>
+
+                        <!-- Attendees Roster -->
+                        <div class="slds-m-top_small slds-p-top_small slds-border_top">
+                            <h4 class="slds-text-title_bold slds-m-bottom_xx-small">Attendees Admitted ({ticketQuantity}):</h4>
+                            <ul class="slds-list_dotted slds-text-body_small">
+                                <template for:each={attendeeList} for:item="a">
+                                    <li key={a.index}><strong>{a.name}</strong> • {a.email} ({a.phone})</li>
+                                </template>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="action-row slds-grid slds-grid_align-center slds-gutters">
+                        <div class="slds-col">
+                            <lightning-button 
+                                variant="neutral" 
+                                label="Explore More Events" 
+                                onclick={handleBackToBrowse}>
+                            </lightning-button>
+                        </div>
+                        <div class="slds-col">
+                            <lightning-button 
+                                variant="brand" 
+                                label="View My Tickets" 
+                                icon-name="utility:identity" 
+                                onclick={handleGoToMyTickets}>
+                            </lightning-button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+        </template>
+
+        <!-- TAB 2: MY TICKETS VIEW -->
+        <template if:true={isMyTicketsTab}>
+            <template if:true={isLoadingTickets}>
+                <div class="slds-p-around_xx-large slds-text-align_center">
+                    <lightning-spinner alternative-text="Loading My Tickets" size="medium"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:false={isLoadingTickets}>
+                <template if:true={hasMyTickets}>
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <template for:each={myTickets} for:item="tkt">
+                            <div key={tkt.ticketId} class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-m-bottom_large">
+                                <div class="ticket-card">
+                                    <div class="ticket-card-header">
+                                        <span class="ticket-number">{tkt.ticketNumber}</span>
+                                        <span class="slds-badge slds-theme_success">{tkt.status}</span>
+                                    </div>
+                                    <div class="ticket-card-body">
+                                        <h3 class="ticket-event-name">{tkt.eventName}</h3>
+                                        <div class="ticket-info-row">
+                                            <lightning-icon icon-name="utility:event" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                            <span>{tkt.formattedStartDate}</span>
+                                        </div>
+                                        <div class="ticket-info-row">
+                                            <lightning-icon icon-name="utility:checkin" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                            <span>{tkt.venueName}, {tkt.venueCity}</span>
+                                        </div>
+                                        <div class="ticket-info-row">
+                                            <lightning-icon icon-name="utility:user" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                            <span>{tkt.attendeeName}</span>
+                                        </div>
+                                        <div class="slds-m-top_small slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                                            <span class="category-badge">{tkt.ticketTypeName}</span>
+                                            <span class="ticket-price-tag">₹{tkt.bookedPrice}</span>
+                                        </div>
+                                    </div>
+                                    <div class="ticket-card-footer">
+                                        <span class="slds-text-body_small slds-text-color_weak">Reg: {tkt.registrationNumber}</span>
+                                        <lightning-button 
+                                            variant="brand-outline" 
+                                            label="View / Print Pass" 
+                                            icon-name="utility:print" 
+                                            data-url={tkt.printableTicketUrl}
+                                            onclick={handlePrintTicket}>
+                                        </lightning-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <template if:false={hasMyTickets}>
+                    <div class="empty-state slds-card slds-p-around_xx-large slds-text-align_center">
+                        <lightning-icon icon-name="utility:identity" size="large" class="slds-m-bottom_medium slds-icon-text-light"></lightning-icon>
+                        <h3 class="slds-text-heading_medium slds-m-bottom_x-small">No Tickets Booked Yet</h3>
+                        <p class="slds-text-color_weak slds-m-bottom_medium">Browse available events and secure your pass today!</p>
+                        <lightning-button variant="brand" label="Browse Events" onclick={handleGoToBrowse}></lightning-button>
+                    </div>
+                </template>
+            </template>
+        </template>
+
+    </div>
+</template>

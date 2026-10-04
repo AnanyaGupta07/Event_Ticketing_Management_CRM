@@ -1,0 +1,90 @@
+<template>
+    <div class="slds-var-p-around_small">
+        <p class="slds-text-body_small slds-m-bottom_small">{capacityPreviewText}</p>
+
+        <template if:true={quotaExceedsCapacity}>
+            <div
+                class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning slds-m-bottom_small"
+                role="alert">
+                <span
+                    >Running quota total exceeds venue capacity. You can still continue —
+                    the authoritative check happens on submit.</span
+                >
+            </div>
+        </template>
+
+        <template if:true={hasNoTicketTypes}>
+            <p class="slds-text-color_weak slds-p-around_medium slds-text-align_center">
+                No ticket types added yet.
+            </p>
+        </template>
+
+        <template for:each={_ticketTypes} for:item="tt">
+            <div key={tt.key} class="slds-box slds-m-bottom_small">
+                <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                        <lightning-input
+                            label="Ticket Type Name"
+                            required
+                            value={tt.name}
+                            data-key={tt.key}
+                            data-field="name"
+                            onchange={handleFieldChange}
+                            onblur={handleBlur}>
+                        </lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12">
+                        <lightning-input
+                            type="number"
+                            step="0.01"
+                            label="Price (₹)"
+                            required
+                            value={tt.price}
+                            data-key={tt.key}
+                            data-field="price"
+                            onchange={handleFieldChange}
+                            onblur={handleBlur}>
+                        </lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12">
+                        <lightning-input
+                            type="number"
+                            label="Quota"
+                            required
+                            value={tt.quota}
+                            data-key={tt.key}
+                            data-field="quota"
+                            onchange={handleFieldChange}
+                            onblur={handleBlur}>
+                        </lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                        <lightning-input
+                            label="Description"
+                            value={tt.description}
+                            data-key={tt.key}
+                            data-field="description"
+                            onchange={handleFieldChange}
+                            onblur={handleBlur}>
+                        </lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-12 slds-text-align_right">
+                        <lightning-button-icon
+                            icon-name="utility:delete"
+                            alternative-text="Remove ticket type"
+                            title="Remove"
+                            data-key={tt.key}
+                            onclick={handleRemoveTicketType}>
+                        </lightning-button-icon>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <lightning-button
+            label="Add Ticket Type"
+            icon-name="utility:add"
+            onclick={handleAddTicketType}>
+        </lightning-button>
+    </div>
+</template>

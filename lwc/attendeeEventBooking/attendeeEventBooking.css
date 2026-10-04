@@ -1,0 +1,377 @@
+.booking-portal-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.portal-header {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    color: #FFFFFF;
+    border-radius: 12px;
+}
+
+.portal-main-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
+}
+
+.portal-subtitle {
+    color: #94A3B8;
+    font-size: 0.95rem;
+    margin-top: 4px;
+}
+
+.filter-bar {
+    background: #FFFFFF;
+    border-radius: 10px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.event-card {
+    border-radius: 12px;
+    border: 1px solid #E2E8F0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: #FFFFFF;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.event-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: #E0F2FE;
+    color: #0369A1;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+.event-card-title {
+    font-weight: 700;
+    color: #0F172A;
+}
+
+.card-btn {
+    --slds-c-button-brand-color-background: #0284C7;
+    --slds-c-button-brand-color-background-hover: #0369A1;
+    font-weight: 600;
+}
+
+/* Detail & Ticket Selection */
+.detail-container {
+    border-radius: 12px;
+    border: 1px solid #E2E8F0;
+}
+
+.detail-event-title {
+    font-weight: 800;
+    color: #0F172A;
+}
+
+.detail-description {
+    color: #475569;
+    line-height: 1.6;
+}
+
+.ticket-type-card {
+    padding: 14px 16px;
+    border: 2px solid #E2E8F0;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #FFFFFF;
+}
+
+.ticket-type-card:hover:not(.ticket-disabled) {
+    border-color: #38BDF8;
+    background: #F0F9FF;
+}
+
+.ticket-type-card.ticket-selected {
+    border-color: #0284C7;
+    background: #F0F9FF;
+    box-shadow: 0 0 0 2px #BAE6FD;
+}
+
+.ticket-type-card.ticket-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #F1F5F9;
+}
+
+.ticket-title {
+    font-weight: 700;
+    color: #0F172A;
+    font-size: 1.05rem;
+}
+
+.ticket-price {
+    font-weight: 800;
+    color: #0284C7;
+    font-size: 1.25rem;
+}
+
+.proceed-btn {
+    --slds-c-button-brand-color-background: #0284C7;
+    height: 44px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Success Card */
+.success-card, .sold-out-card {
+    max-width: 580px;
+    margin: 0 auto;
+    border-radius: 12px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.success-icon-wrap {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto;
+    background: #DCFCE7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.success-title {
+    font-weight: 800;
+    color: #065F46;
+}
+
+.booking-receipt code {
+    background: #E2E8F0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+/* Navigation Tabs */
+.nav-tabs-bar {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.portal-tab {
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.12);
+    color: #E2E8F0;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.portal-tab:hover {
+    background: rgba(255, 255, 255, 0.22);
+    color: #FFFFFF;
+}
+
+.portal-tab.active {
+    background: #0284C7;
+    color: #FFFFFF;
+    border-color: #38BDF8;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+}
+
+.badge-count {
+    background: #FFFFFF;
+    color: #0284C7;
+    padding: 1px 7px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    margin-left: 6px;
+    font-weight: 700;
+}
+
+/* My Tickets Grid & Cards */
+.ticket-card {
+    background: #FFFFFF;
+    border-radius: 14px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.ticket-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.ticket-card-header {
+    background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+    color: #FFFFFF;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ticket-number {
+    font-family: monospace;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #38BDF8;
+}
+
+.ticket-card-body {
+    padding: 18px;
+    flex: 1;
+}
+
+.ticket-event-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 10px;
+}
+
+.ticket-info-row {
+    display: flex;
+    align-items: center;
+    color: #64748B;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+}
+
+.ticket-price-tag {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0284C7;
+}
+
+.ticket-card-footer {
+    padding: 14px 18px;
+    background: #F8FAFC;
+    border-top: 1px solid #E2E8F0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Ticket Counter & Multi-Attendee Styling */
+.ticket-counter-card {
+    background: #F8FAFC;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+}
+
+.counter-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0F172A;
+}
+
+.counter-subtext {
+    font-size: 0.75rem;
+    color: #64748B;
+    margin-top: 2px;
+}
+
+.counter-controls {
+    display: inline-flex;
+    align-items: center;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    padding: 3px;
+}
+
+.counter-btn {
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    width: 34px;
+    height: 34px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0284C7;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.counter-btn:hover:not(:disabled) {
+    background: #E0F2FE;
+    color: #0369A1;
+}
+
+.counter-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.counter-display {
+    min-width: 44px;
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0F172A;
+}
+
+.total-price-text {
+    font-size: 1.2rem;
+    color: #0284C7;
+    font-weight: 800;
+}
+
+.attendee-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+}
+
+.attendee-card:hover {
+    border-color: #0284C7;
+}
+
+.attendee-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    background: #E0F2FE;
+    color: #0369A1;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 12px;
+    text-transform: uppercase;
+}
+

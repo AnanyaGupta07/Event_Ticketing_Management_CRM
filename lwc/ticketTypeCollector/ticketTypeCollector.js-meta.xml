@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>61.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Ticket Type Collector</masterLabel>
+    <description>Dynamic add/remove list of Ticket Type rows (Name/Price/Quota/Description) with a running quota-vs-venue-capacity preview. Drop into a Screen Flow screen in place of the Add_Ticket_Type/Add_Another_Ticket_Type Go-To loop from event-creation-flow.md.</description>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property
+                name="venueCapacity"
+                label="Venue Capacity"
+                type="Integer"
+                role="inputOnly"
+                description="Selected venue's capacity, used only for the running-total preview. Bind to Get_Selected_Venue_Capacity's Venue_Capacity__c output." />
+            <property
+                name="ticketTypes"
+                label="Ticket Types"
+                type="apex://TicketTypeWrapper[]"
+                description="The ticket types the organizer entered. Bind to a Flow collection variable of Apex-Defined type TicketTypeWrapper (Allow multiple values: on)." />
+            <property
+                name="runningQuotaTotal"
+                label="Running Quota Total"
+                type="Integer"
+                role="outputOnly"
+                description="Live sum of all ticket type quotas entered so far, if a later screen (e.g. Review) wants to display it." />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>
