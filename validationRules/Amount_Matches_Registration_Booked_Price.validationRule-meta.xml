@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Amount_Matches_Registration_Booked_Price</fullName>
+    <active>true</active>
+    <description>Ensures the payment amount matches the locked-in booked price on the registration.</description>
+    <errorConditionFormula>Amount__c &lt;&gt; Registration__r.Booked_Price__c</errorConditionFormula>
+    <errorDisplayField>Amount__c</errorDisplayField>
+    <errorMessage>Payment amount must match the booked price of the registration.</errorMessage>
+</ValidationRule>

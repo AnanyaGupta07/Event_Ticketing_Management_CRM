@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>User__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Binds a portal/community Attendee record to the logged-in Salesforce User for ownership checks</description>
+    <externalId>false</externalId>
+    <label>User</label>
+    <referenceTo>User</referenceTo>
+    <relationshipName>Attendees</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

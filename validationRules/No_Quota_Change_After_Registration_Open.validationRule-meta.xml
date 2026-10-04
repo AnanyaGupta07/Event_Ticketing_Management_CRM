@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>No_Quota_Change_After_Registration_Open</fullName>
+    <active>true</active>
+    <description>Locks ticket quota once event registration has opened.</description>
+    <errorConditionFormula>ISCHANGED(Quota__c) &amp;&amp; ISPICKVAL(Event__r.Registration_Status__c, &quot;Open&quot;)</errorConditionFormula>
+    <errorDisplayField>Quota__c</errorDisplayField>
+    <errorMessage>Ticket quota cannot be modified after registration has opened.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>No_Booking_On_Rejected_Or_Cancelled</fullName>
+    <active>true</active>
+    <description>Ensures Rejected or Cancelled events cannot remain in Published status.</description>
+    <errorConditionFormula>(ISPICKVAL(Approval_Status__c, &quot;Rejected&quot;) || ISPICKVAL(Approval_Status__c, &quot;Cancelled&quot;)) &amp;&amp; ISPICKVAL(Publication_Status__c, &quot;Published&quot;)</errorConditionFormula>
+    <errorDisplayField>Publication_Status__c</errorDisplayField>
+    <errorMessage>Rejected or Cancelled events cannot be published.</errorMessage>
+</ValidationRule>

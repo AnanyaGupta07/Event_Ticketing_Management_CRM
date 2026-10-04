@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>End_After_Start</fullName>
+    <active>true</active>
+    <description>Ensures that the event End Date/Time is strictly after the Start Date/Time.</description>
+    <errorConditionFormula>Start_Date_Time__c &gt;= End_Date_Time__c</errorConditionFormula>
+    <errorDisplayField>End_Date_Time__c</errorDisplayField>
+    <errorMessage>End Date/Time must be strictly after Start Date/Time.</errorMessage>
+</ValidationRule>

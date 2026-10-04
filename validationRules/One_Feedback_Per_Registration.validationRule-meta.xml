@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>One_Feedback_Per_Registration</fullName>
+    <active>true</active>
+    <description>Ensures only one feedback submission is recorded per registration.</description>
+    <errorConditionFormula>Registration__r.Feedback_Submitted__c = TRUE</errorConditionFormula>
+    <errorDisplayField>Registration__c</errorDisplayField>
+    <errorMessage>Feedback has already been submitted for this registration.</errorMessage>
+</ValidationRule>
