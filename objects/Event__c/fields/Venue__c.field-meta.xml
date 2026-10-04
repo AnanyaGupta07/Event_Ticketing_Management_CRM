@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Venue__c</fullName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <description>Venue hosting this event</description>
+    <externalId>false</externalId>
+    <label>Venue</label>
+    <referenceTo>Venue__c</referenceTo>
+    <relationshipLabel>Events</relationshipLabel>
+    <relationshipName>Events</relationshipName>
+    <required>true</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

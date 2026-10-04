@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>No_Feedback_Before_Event_Ends</fullName>
+    <active>true</active>
+    <description>Ensures feedback cannot be submitted before the event has concluded.</description>
+    <errorConditionFormula>Registration__r.Event__r.End_Date_Time__c &gt; NOW()</errorConditionFormula>
+    <errorDisplayField>Overall_Rating__c</errorDisplayField>
+    <errorMessage>Feedback cannot be submitted before the event has ended.</errorMessage>
+</ValidationRule>

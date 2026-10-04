@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>No_Self_Approval</fullName>
+    <active>true</active>
+    <description>Prevents an event organizer from approving their own event.</description>
+    <errorConditionFormula>ISPICKVAL(Approval_Status__c, &quot;Approved&quot;) &amp;&amp; NOT(ISBLANK(Approved_By__c)) &amp;&amp; Approved_By__c = Organizer__c</errorConditionFormula>
+    <errorDisplayField>Approval_Status__c</errorDisplayField>
+    <errorMessage>An organizer cannot approve their own event.</errorMessage>
+</ValidationRule>

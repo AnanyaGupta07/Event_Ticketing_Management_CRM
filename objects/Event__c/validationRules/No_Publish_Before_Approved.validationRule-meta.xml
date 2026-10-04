@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>No_Publish_Before_Approved</fullName>
+    <active>true</active>
+    <description>Ensures an event cannot be published unless it has achieved Approved status.</description>
+    <errorConditionFormula>ISPICKVAL(Publication_Status__c, &quot;Published&quot;) &amp;&amp; NOT(ISPICKVAL(Approval_Status__c, &quot;Approved&quot;))</errorConditionFormula>
+    <errorDisplayField>Publication_Status__c</errorDisplayField>
+    <errorMessage>An event cannot be published until its approval status is Approved.</errorMessage>
+</ValidationRule>
