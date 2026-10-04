@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event Management CRM — Complete Master Workflow Flowchart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <!-- Mermaid.js for high-fidelity vector diagram rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+  <style>
+    :root {
+      --bg-canvas: #090d16;
+      --bg-ui: rgba(15, 23, 42, 0.9);
+      --border-subtle: rgba(255, 255, 255, 0.1);
+      --primary: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-canvas);
+      background-image: 
+        radial-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+        radial-gradient(rgba(168, 85, 247, 0.05) 1px, transparent 1px);
+      background-size: 32px 32px;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      user-select: none;
+    }
+
+    /* Fixed Floating Header Bar */
+    .top-toolbar {
+      position: fixed;
+      top: 16px;
+      left: 20px;
+      right: 20px;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-ui);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 10px 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .toolbar-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, #0284c7, #8b5cf6);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.35);
+    }
+
+    .title-text h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    .title-text span {
+      font-size: 0.72rem;
+      color: var(--primary);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .control-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .control-btn.active {
+      background: var(--primary);
+      color: #0b0f19;
+      border-color: var(--primary);
+    }
+
+    /* Zoom & Pan Navigation Dock (Bottom Left) */
+    .zoom-dock {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 100;
+      background: var(--bg-ui);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .zoom-label {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      padding: 0 8px;
+      color: var(--text-main);
+      min-width: 50px;
+      text-align: center;
+    }
+
+    /* Legend Dock (Bottom Right) */
+    .legend-dock {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100;
+      background: var(--bg-ui);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Viewport & Pan-Zoom Canvas */
+    #viewport {
+      width: 100vw;
+      height: 100vh;
+      cursor: grab;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #viewport:active {
+      cursor: grabbing;
+    }
+
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: 0 0;
+      transition: transform 0.05s ease-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 100%;
+      min-height: 100%;
+      padding: 120px 80px;
+    }
+
+    /* Mermaid SVG overrides for sleek presentation */
+    .mermaid {
+      display: block;
+      margin: auto;
+    }
+
+    .mermaid svg {
+      max-width: none !important;
+      height: auto !important;
+      filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.4));
+    }
+
+    /* Customizing Mermaid nodes & subgraphs */
+    .node rect, .node circle, .node polygon {
+      rx: 8px !important;
+      ry: 8px !important;
+      stroke-width: 1.5px !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .node:hover rect, .node:hover polygon {
+      stroke-width: 2.5px !important;
+      filter: brightness(1.2) drop-shadow(0 0 10px rgba(56, 189, 248, 0.6)) !important;
+    }
+
+    .cluster rect {
+      rx: 14px !important;
+      ry: 14px !important;
+      stroke-dasharray: 4 4 !important;
+      stroke-width: 1.5px !important;
+    }
+
+    .edgePath path {
+      stroke-width: 2px !important;
+    }
+
+    /* Instructions Overlay */
+    .hint-toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: var(--primary);
+      font-family: var(--font-mono);
+      pointer-events: none;
+      z-index: 50;
+      animation: fadeOut 6s forwards;
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { opacity: 0; display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Header Toolbar -->
+  <div class="top-toolbar">
+    <div class="toolbar-title">
+      <div class="badge-icon">⚡</div>
+      <div class="title-text">
+        <h1>Event Management CRM — Master Workflow Flowchart</h1>
+        <span>Interactive Pure Flowchart Diagram • Click &amp; Drag to Pan • Scroll to Zoom</span>
+      </div>
+    </div>
+
+    <div class="toolbar-actions">
+      <button class="control-btn" onclick="fitToScreen()">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        </svg>
+        Fit Diagram
+      </button>
+
+      <button class="control-btn" onclick="toggleFullscreen()">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 3H6a2 2 0 00-2 2v4m16-4h-4a2 2 0 01-2-2V3m0 18h4a2 2 0 002-2v-4M4 14v4a2 2 0 002 2h4" />
+        </svg>
+        Fullscreen
+      </button>
+    </div>
+  </div>
+
+  <div class="hint-toast">💡 Tip: Drag canvas to pan • Mouse wheel to zoom in/out</div>
+
+  <!-- Zoom & Pan Navigation Dock -->
+  <div class="zoom-dock">
+    <button class="icon-btn" onclick="zoomIn()" title="Zoom In">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6" />
+      </svg>
+    </button>
+    <span class="zoom-label" id="zoomLevel">100%</span>
+    <button class="icon-btn" onclick="zoomOut()" title="Zoom Out">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6" />
+      </svg>
+    </button>
+    <button class="icon-btn" onclick="resetZoom()" title="Reset Zoom">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Legend Dock -->
+  <div class="legend-dock">
+    <div class="legend-item"><div class="legend-dot" style="background: #38bdf8;"></div> Admin Setup</div>
+    <div class="legend-item"><div class="legend-dot" style="background: #a855f7;"></div> Organizer Flow</div>
+    <div class="legend-item"><div class="legend-dot" style="background: #f59e0b;"></div> Approval Matrix</div>
+    <div class="legend-item"><div class="legend-dot" style="background: #10b981;"></div> Attendee Portal</div>
+    <div class="legend-item"><div class="legend-dot" style="background: #ec4899;"></div> UPI QR Payment</div>
+    <div class="legend-item"><div class="legend-dot" style="background: #06b6d4;"></div> Gate Check-In</div>
+    <div class="legend-item"><div class="legend-dot" style="background: #14b8a6;"></div> Automated Flows</div>
+  </div>
+
+  <!-- Viewport for Infinite Canvas -->
+  <div id="viewport">
+    <div id="canvas-container">
+      <pre class="mermaid" id="flowchartDiagram">
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "darkMode": true,
+    "background": "#090d16",
+    "primaryColor": "#1e293b",
+    "primaryBorderColor": "#38bdf8",
+    "primaryTextColor": "#f8fafc",
+    "lineColor": "#64748b",
+    "secondaryColor": "#1e1e38",
+    "tertiaryColor": "#0f172a",
+    "fontSize": "13px",
+    "fontFamily": "Plus Jakarta Sans, sans-serif"
+  }
+}}%%
+
+flowchart TD
+
+    %% 1. SYSTEM ADMIN
+    subgraph ADMIN["1. SYSTEM ADMINISTRATOR &amp; PLATFORM SETUP"]
+        A1([Start: Organization Setup]) --> A2[Define Baseline OWD:<br/>Event__c = Private<br/>Venue__c = Public Read Only<br/>Attendee__c = Private<br/>Children = Controlled by Parent]
+        A2 --> A3[Configure Role Hierarchy:<br/>Manager &gt; Organizer / Finance &gt; Reg Team]
+        A3 --> A4[Setup Custom Metadata Types:<br/>Approval_Matrix__mdt - Category Limits<br/>Payment_Gateway_Config__mdt - UPI VPA]
+        A4 --> A5[Create Physical Venues &amp;<br/>Set Venue_Capacity__c Safety Ceiling]
+    end
+
+    %% 2. EVENT ORGANIZER
+    subgraph ORGANIZER["2. EVENT ORGANIZER: CREATION &amp; TICKET TIERS"]
+        O1([Organizer Logs In]) --> O2[Open Organizer Dashboard LWC<br/>Queries Private Events via with sharing]
+        O2 --> O3[Click: + Create Event Action]
+        O3 --> O4[Launch Event_Creation_Screen_Flow:<br/>Name, Description &amp; Picklist: 9 Categories]
+        O4 --> O5[Select Venue:<br/>Flow Displays Facility &amp; Venue_Capacity__c]
+        O5 --> O6[Embedded LWC: ticketTypeCollector<br/>Add N Dynamic Tiers: Price ₹ &amp; Quotas]
+        O6 --> D_CAP{SUM Quotas &lt;= Venue_Capacity__c?}
+        D_CAP -- "Violation (Exceeds)" --> O6
+        D_CAP -- "Valid" --> O7[Enter Proposed_Budget__c in ₹]
+        O7 --> O8[Atomic Save:<br/>Inserts Event__c &amp; Ticket_Type__c<br/>Rollup Total_Capacity__c Calculates]
+    end
+
+    A5 -.-> O5
+
+    %% 3. APPROVAL ENGINE
+    subgraph APPROVAL["3. DYNAMIC MULTI-TIER CATEGORY APPROVAL ENGINE"]
+        AP1[EventApprovalService.cls<br/>Evaluates Category Ceilings via Approval_Matrix__mdt]
+        O8 --> AP1
+        
+        AP1 --> D_AUTO{Proposed Budget &lt;=<br/>Category Auto-Limit?}
+        
+        D_AUTO -- "YES (Tier 1: Auto-Approved)" --> AP_OK[Approval_Status__c = Approved]
+        
+        D_AUTO -- "NO (Requires Review)" --> AP_SUB[Submit to Salesforce Approval Process<br/>Status = Pending Approval<br/>Record Locked]
+        
+        AP_SUB --> D_ESC{Budget &gt; Manager Limit?}
+        D_ESC -- "YES (Tier 3)" --> AP_FIN[Flag Requires_Finance_Signoff = TRUE<br/>Escalate to Executive Signoff]
+        D_ESC -- "NO (Tier 2)" --> AP_MGR[Route to Event Manager Queue/User]
+        
+        AP_FIN --> D_DEC{Approver Decision}
+        AP_MGR --> D_DEC
+        
+        D_DEC -- "APPROVE" --> AP_OK
+        D_DEC -- "REJECT" --> AP_REJ[Approval_Status__c = Rejected<br/>Approver Enters Rejection_Reason__c]
+        
+        AP_REJ --> D_RESUB{Organizer Action}
+        D_RESUB -- "Modify Budget &amp; Resubmit" --> AP1
+        D_RESUB -- "Cancel Event" --> AP_CANCEL([Approval_Status__c = Cancelled])
+    end
+
+    %% 4. PUBLICATION
+    subgraph PUBLICATION["4. PUBLICATION &amp; INVENTORY LOCKDOWN"]
+        AP_OK --> P1[Organizer Clicks: Publish Event]
+        P1 --> P2[Publication_Status__c = Published<br/>Registration_Status__c = Open]
+        P2 --> P3[Database Validation Rules Fire:<br/>1. No_Price_Change_After_Registration_Open<br/>2. No_Quota_Change_After_Registration_Open<br/>3. Quota_Not_Below_Booked_Seats]
+    end
+
+    %% 5. ATTENDEE BOOKING
+    subgraph ATTENDEE["5. ATTENDEE DISCOVERY &amp; MULTI-SEAT BOOKING"]
+        P3 --> AT1[Attendee Browses Portal Event_Booking Tab<br/>Controller filters Active &amp; Published Events]
+        AT1 --> AT2[Select Ticket Tier &amp; Multi-Seat Stepper: - 2 +]
+        AT2 --> AT3[Fill Guest Roster Form:<br/>Names, Emails, 10-Digit Mobile Numbers]
+        AT3 --> AT4[Call EventBookingController.bookMultipleTickets]
+        AT4 --> D_SEATS{FOR UPDATE Row Lock:<br/>Available_Seats__c &gt;= N?}
+        D_SEATS -- "NO" --> AT_FAIL([Sold Out Alert: Overbooking Prevented])
+        D_SEATS -- "YES" --> AT5[Create/Match Attendee__c Records &amp;<br/>Insert Pending Registration__c Records]
+        AT5 --> AT6[Assign Shared Booking_Group_Id__c<br/>Lock in Booked_Price__c Snapshot]
+    end
+
+    %% 6. UPI PAYMENT
+    subgraph PAYMENT["6. SIMULATED UPI QR PAYMENT &amp; SETTLEMENT"]
+        AT6 --> PM1[Open LWC paymentQrVerification<br/>Retrieve VPA &amp; Credentials from Payment_Gateway_Config__mdt]
+        PM1 --> PM2[Generate Dynamic UPI Intent:<br/>upi://pay?pa=events@upi&amp;pn=EventHub&amp;am=Total&amp;tr=Group_Id]
+        PM2 --> PM3[Render QR Code inside 170px SVG Countdown Ring<br/>10-Second Auto-Verification Timer]
+        PM3 --> PM4{Countdown Finishes OR<br/>Attendee clicks I Have Paid}
+        PM4 --> PM5[Call EventBookingController.confirmPayment]
+        PM5 --> D_IDEMP{Idempotency Guard:<br/>Payment already exists?}
+        D_IDEMP -- "YES" --> PM_SKIP([Prevent Duplicate Payment])
+        D_IDEMP -- "NO" --> PM6[Insert Payment__c Record:<br/>Status = Successful, Method = UPI]
+        PM6 --> PM7[Atomically Flip All Registrations in Group:<br/>Status: Pending -&gt; Confirmed]
+        PM7 --> PM8[Generate Official Ticket__c Entry Passes:<br/>Autonumber TKT-XXXXX]
+    end
+
+    %% 7. PASS & CHECK-IN
+    subgraph PASS["7. BARCODE PASS &amp; GATE CHECK-IN"]
+        PM8 --> PS1[Attendee Navigates to My Tickets Tab]
+        PS1 --> PS2[Click View/Print Pass:<br/>Visualforce PDF PrintableTicket.page]
+        PS2 --> PS3[PDF Renders Event Branding, Machine Barcode,<br/>Primary Booker &amp; Full Co-Attendee Roster]
+        PS3 --> PS4[Event Day at Venue:<br/>Registration Team Scans Barcode at Gate]
+        PS4 --> D_CHECK{Ticket_Status__c == Active?}
+        D_CHECK -- "YES" --> PS5[Flip Ticket_Status__c = Checked In<br/>Print Badge / Grant Entry]
+        D_CHECK -- "NO" --> PS6([Security Warning: Already Checked In / Cancelled])
+    end
+
+    %% 8. AUTOMATION & SURVEY
+    subgraph AUTOMATION["8. BACKGROUND AUTOMATION &amp; POST-EVENT FEEDBACK"]
+        P3 --> AU1[Scheduled Flow 3: Exactly 24h Prior to Event Start]
+        AU1 --> AU2[Send Automated Email Reminder<br/>with Barcode Link &amp; Venue Directions]
+        PS5 --> AU3[Event Concludes: End_Date_Time Passed]
+        AU3 --> AU4[Scheduled Flow 4: Exactly 10h Post Event End]
+        AU4 --> AU5[Send Post-Event Satisfaction Survey Email]
+        AU5 --> AU6[Attendee Submits 1-5 Star Ratings:<br/>Overall, Venue, Speaker Experience]
+        AU6 --> AU7[Trigger Sets Feedback_Submitted__c = TRUE<br/>Locks against duplicate submissions]
+        AU7 --> AU8([Executive Dashboards &amp; Revenue Reports Updated])
+    end
+
+    %% Node styling classes
+    classDef adminNode fill:#0c4a6e,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff;
+    classDef orgNode fill:#581c87,stroke:#c084fc,stroke-width:2px,color:#fdf4ff;
+    classDef appNode fill:#78350f,stroke:#fbbf24,stroke-width:2px,color:#fffbeb;
+    classDef pubNode fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#f0fdf4;
+    classDef attNode fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ecfdf5;
+    classDef payNode fill:#831843,stroke:#f472b6,stroke-width:2px,color:#fff1f2;
+    classDef passNode fill:#155e75,stroke:#22d3ee,stroke-width:2px,color:#ecfeff;
+    classDef autoNode fill:#134e4a,stroke:#2dd4bf,stroke-width:2px,color:#f0fdfa;
+
+    class A1,A2,A3,A4,A5 adminNode;
+    class O1,O2,O3,O4,O5,O6,O7,O8,D_CAP orgNode;
+    class AP1,D_AUTO,AP_OK,AP_SUB,D_ESC,AP_FIN,AP_MGR,D_DEC,AP_REJ,D_RESUB,AP_CANCEL appNode;
+    class P1,P2,P3 pubNode;
+    class AT1,AT2,AT3,AT4,D_SEATS,AT_FAIL,AT5,AT6 attNode;
+    class PM1,PM2,PM3,PM4,PM5,D_IDEMP,PM_SKIP,PM6,PM7,PM8 payNode;
+    class PS1,PS2,PS3,PS4,D_CHECK,PS5,PS6 passNode;
+    class AU1,AU2,AU3,AU4,AU5,AU6,AU7,AU8 autoNode;
+      </pre>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Mermaid with dark aesthetic
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      securityLevel: 'loose',
+      flowchart: {
+        useMaxWidth: false,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    // Pan & Zoom Engine
+    let scale = 0.9;
+    let pointX = 0;
+    let pointY = 0;
+    let startX = 0;
+    let startY = 0;
+    let isPanning = false;
+
+    const viewport = document.getElementById('viewport');
+    const container = document.getElementById('canvas-container');
+    const zoomDisplay = document.getElementById('zoomLevel');
+
+    function updateTransform() {
+      container.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+      zoomDisplay.innerText = `${Math.round(scale * 100)}%`;
+    }
+
+    viewport.addEventListener('mousedown', function(e) {
+      if (e.target.closest('.top-toolbar') || e.target.closest('.zoom-dock') || e.target.closest('.legend-dock')) return;
+      isPanning = true;
+      startX = e.clientX - pointX;
+      startY = e.clientY - pointY;
+    });
+
+    window.addEventListener('mouseup', function() {
+      isPanning = false;
+    });
+
+    window.addEventListener('mousemove', function(e) {
+      if (!isPanning) return;
+      pointX = e.clientX - startX;
+      pointY = e.clientY - startY;
+      updateTransform();
+    });
+
+    viewport.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      const zoomFactor = 1.12;
+      let newScale = e.deltaY < 0 ? scale * zoomFactor : scale / zoomFactor;
+      
+      // Limit scale bounds
+      if (newScale < 0.2) newScale = 0.2;
+      if (newScale > 3.0) newScale = 3.0;
+
+      // Center zoom around mouse cursor
+      const rect = viewport.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      pointX -= (mouseX - pointX) * (newScale / scale - 1);
+      pointY -= (mouseY - pointY) * (newScale / scale - 1);
+      scale = newScale;
+      updateTransform();
+    }, { passive: false });
+
+    function zoomIn() {
+      scale = Math.min(scale * 1.25, 3.0);
+      updateTransform();
+    }
+
+    function zoomOut() {
+      scale = Math.max(scale / 1.25, 0.2);
+      updateTransform();
+    }
+
+    function resetZoom() {
+      scale = 0.9;
+      pointX = 0;
+      pointY = 0;
+      updateTransform();
+    }
+
+    function fitToScreen() {
+      const svg = document.querySelector('.mermaid svg');
+      if (!svg) return;
+      const svgRect = svg.getBoundingClientRect();
+      const viewRect = viewport.getBoundingClientRect();
+
+      const scaleX = (viewRect.width - 120) / (svgRect.width / scale);
+      const scaleY = (viewRect.height - 180) / (svgRect.height / scale);
+      scale = Math.min(scaleX, scaleY, 1.2);
+      
+      // Center diagram
+      pointX = (viewRect.width - (svgRect.width / (svgRect.width / (svg.clientWidth * scale)))) / 4;
+      pointY = 60;
+      updateTransform();
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Auto-fit after Mermaid finishes rendering
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        fitToScreen();
+      }, 500);
+    });
+  </script>
+</body>
+</html>
