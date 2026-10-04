@@ -1,0 +1,258 @@
+<apex:page controller="PrintableTicketExtension" renderAs="pdf" applyHtmlTag="false" showHeader="false" sidebar="false">
+    <html>
+        <head>
+            <style type="text/css">
+                @page {
+                    size: letter portrait;
+                    margin: 15mm;
+                    @bottom-center {
+                        content: "Salesforce Event Management • Official Admission Pass";
+                        font-family: Arial, sans-serif;
+                        font-size: 8pt;
+                        color: #94a3b8;
+                    }
+                }
+                body {
+                    font-family: 'Arial Unicode MS', Arial, Helvetica, sans-serif;
+                    color: #0f172a;
+                    margin: 0;
+                    padding: 0;
+                }
+                .ticket-container {
+                    border: 2px dashed #0284c7;
+                    border-radius: 12px;
+                    padding: 22px;
+                    background-color: #ffffff;
+                }
+                .header-table {
+                    width: 100%;
+                    border-bottom: 2px solid #e2e8f0;
+                    padding-bottom: 14px;
+                    margin-bottom: 18px;
+                }
+                .event-title {
+                    font-size: 20pt;
+                    font-weight: bold;
+                    color: #0369a1;
+                    margin: 0;
+                }
+                .ticket-badge {
+                    background-color: #e0f2fe;
+                    color: #0284c7;
+                    padding: 5px 12px;
+                    border-radius: 20px;
+                    font-size: 9pt;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    display: inline-block;
+                }
+                .group-badge {
+                    background-color: #fef3c7;
+                    color: #b45309;
+                    padding: 5px 12px;
+                    border-radius: 20px;
+                    font-size: 9pt;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    display: inline-block;
+                    margin-left: 6px;
+                }
+                .content-table {
+                    width: 100%;
+                    margin-bottom: 18px;
+                }
+                .content-table td {
+                    vertical-align: top;
+                    padding: 5px 0;
+                }
+                .label {
+                    font-size: 8.5pt;
+                    color: #64748b;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                }
+                .value {
+                    font-size: 11pt;
+                    color: #0f172a;
+                    font-weight: bold;
+                }
+                .roster-section {
+                    margin-top: 14px;
+                    margin-bottom: 16px;
+                }
+                .roster-title {
+                    font-size: 11pt;
+                    font-weight: bold;
+                    color: #0369a1;
+                    text-transform: uppercase;
+                    border-bottom: 1px solid #cbd5e1;
+                    padding-bottom: 4px;
+                    margin-bottom: 8px;
+                }
+                .roster-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 9pt;
+                }
+                .roster-table th {
+                    background-color: #f1f5f9;
+                    color: #475569;
+                    text-align: left;
+                    padding: 6px 8px;
+                    border: 1px solid #e2e8f0;
+                    font-size: 8pt;
+                    text-transform: uppercase;
+                }
+                .roster-table td {
+                    padding: 6px 8px;
+                    border: 1px solid #e2e8f0;
+                    color: #1e293b;
+                }
+                .barcode-box {
+                    background-color: #f8fafc;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 8px;
+                    padding: 12px;
+                    text-align: center;
+                    margin-top: 14px;
+                }
+                .barcode-code {
+                    font-family: 'Courier New', Courier, monospace;
+                    font-size: 13pt;
+                    letter-spacing: 3px;
+                    color: #334155;
+                    font-weight: bold;
+                }
+                .terms-text {
+                    font-size: 7.5pt;
+                    color: #94a3b8;
+                    margin-top: 16px;
+                    line-height: 1.35;
+                    text-align: justify;
+                }
+                .not-found-box {
+                    padding: 40px;
+                    text-align: center;
+                    font-family: Arial, sans-serif;
+                    color: #475569;
+                }
+            </style>
+        </head>
+        <body>
+            <apex:outputPanel rendered="{!primaryTicket.Id != null}">
+                <div class="ticket-container">
+                    <table class="header-table">
+                        <tr>
+                            <td>
+                                <div>
+                                    <span class="ticket-badge">{!primaryTicket.Registration__r.Ticket_Type__r.Name}</span>
+                                    <apex:outputPanel rendered="{!isGroupBooking}">
+                                        <span class="group-badge">Group Pass ({!totalAttendeeCount} Attendees)</span>
+                                    </apex:outputPanel>
+                                </div>
+                                <h1 class="event-title">{!primaryTicket.Registration__r.Event__r.Name}</h1>
+                            </td>
+                            <td style="text-align: right;">
+                                <span class="label">Pass Status</span><br/>
+                                <span class="value" style="color: #16a34a;">{!primaryTicket.Ticket_Status__c}</span>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="content-table">
+                        <tr>
+                            <td style="width: 50%;">
+                                <span class="label">Primary Booker</span><br/>
+                                <span class="value">{!primaryTicket.Registration__r.Attendee__r.Name}</span>
+                            </td>
+                            <td style="width: 50%;">
+                                <span class="label">Booker Email</span><br/>
+                                <span class="value">{!primaryTicket.Registration__r.Attendee__r.Email__c}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="label">Event Date &amp; Time</span><br/>
+                                <span class="value">
+                                    <apex:outputText value="{0,date,MMMM d, yyyy 'at' hh:mm a}">
+                                        <apex:param value="{!primaryTicket.Registration__r.Event__r.Start_Date_Time__c}" />
+                                    </apex:outputText>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="label">Venue Location</span><br/>
+                                <span class="value">{!primaryTicket.Registration__r.Event__r.Venue__r.Name}</span><br/>
+                                <span style="font-size: 8.5pt; color: #475569;">
+                                    {!primaryTicket.Registration__r.Event__r.Venue__r.Address__c}, {!primaryTicket.Registration__r.Event__r.Venue__r.City__c}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="label">Booking Reference</span><br/>
+                                <span class="value">
+                                    <apex:outputText value="{!IF(ISBLANK(primaryTicket.Registration__r.Booking_Group_Id__c), primaryTicket.Registration__r.Name, primaryTicket.Registration__r.Booking_Group_Id__c)}" />
+                                </span>
+                            </td>
+                            <td>
+                                <span class="label">Total Amount Paid</span><br/>
+                                <span class="value">
+                                    <apex:outputText value="₹{0,number,###,###,##0.00}">
+                                        <apex:param value="{!IF(isGroupBooking, totalGroupPrice, primaryTicket.Registration__r.Booked_Price__c)}" />
+                                    </apex:outputText>
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- ALL ATTENDEES ROSTER TABLE -->
+                    <div class="roster-section">
+                        <div class="roster-title">
+                            <apex:outputText value="{!IF(isGroupBooking, 'Booked Attendees Roster (' + TEXT(totalAttendeeCount) + ' Attendees)', 'Registered Attendee Pass')}" />
+                        </div>
+                        <table class="roster-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 6%;">#</th>
+                                    <th style="width: 32%;">Attendee Name</th>
+                                    <th style="width: 30%;">Email Address</th>
+                                    <th style="width: 16%;">Phone</th>
+                                    <th style="width: 16%;">Ticket Code</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <apex:variable var="index" value="{!1}" />
+                                <apex:repeat value="{!groupTickets}" var="gt">
+                                    <tr>
+                                        <td style="text-align: center; font-weight: bold;">{!index}</td>
+                                        <td><strong>{!gt.Registration__r.Attendee__r.Name}</strong></td>
+                                        <td>{!gt.Registration__r.Attendee__r.Email__c}</td>
+                                        <td>{!gt.Registration__r.Attendee__r.Phone__c}</td>
+                                        <td><span style="font-family: monospace; font-weight: bold; color: #0284c7;">{!gt.Name}</span></td>
+                                    </tr>
+                                    <apex:variable var="index" value="{!index + 1}" />
+                                </apex:repeat>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="barcode-box">
+                        <span class="label">Official Check-In Code</span><br/>
+                        <span class="barcode-code">||| | ||||| |||| | ||| {!primaryTicket.Name} ||| | |||||</span>
+                    </div>
+
+                    <div class="terms-text">
+                        This ticket is an official proof of registration for all attendees listed above. Please present either a printed copy or digital PDF pass upon entry at the venue check-in desk. Each attendee listed is admitted under their assigned Ticket Code. Tickets are non-transferable without prior organizer authorization. For event updates or schedule modifications, please check the Event Portal.
+                    </div>
+                </div>
+            </apex:outputPanel>
+
+            <apex:outputPanel rendered="{!primaryTicket.Id == null}">
+                <div class="not-found-box">
+                    <h2 style="color: #0369a1;">Ticket Pass Not Found</h2>
+                    <p>The requested admission pass could not be retrieved. Please check your booking reference or return to the Event Portal.</p>
+                </div>
+            </apex:outputPanel>
+        </body>
+    </html>
+</apex:page>

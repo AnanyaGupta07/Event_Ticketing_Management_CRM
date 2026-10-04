@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Bundles event operations roles including Event Organizers, Registration Staff, and Speaker Coordinators into a single operational unit.</description>
+    <label>Event Operations Staff</label>
+    <permissionSets>Event_Organizer_Permissions</permissionSets>
+    <permissionSets>Event_Registration_Team_Permissions</permissionSets>
+    <permissionSets>Event_Speaker_Coordinator_Permissions</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>
