@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Self-service attendee portal tab hosting the attendeeEventBooking Lightning Web Component.</description>
+    <label>Event Booking</label>
+    <lwcComponent>attendeeEventBooking</lwcComponent>
+    <motif>Custom44: Hand</motif>
+</CustomTab>

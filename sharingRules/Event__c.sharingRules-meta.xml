@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingCriteriaRules>
+        <fullName>Share_Pending_Approval_Events_With_Managers</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>Shares all events with Approval Status = Pending Approval with users in the Event Manager role.</description>
+        <label>Share Pending Approval Events With Managers</label>
+        <sharedTo>
+            <role>Event_Manager</role>
+        </sharedTo>
+        <criteriaItems>
+            <field>Approval_Status__c</field>
+            <operation>equals</operation>
+            <value>Pending Approval</value>
+        </criteriaItems>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Share_Published_Events_With_Staff</fullName>
+        <accessLevel>Read</accessLevel>
+        <description>Shares all events with Publication Status = Published with event staff under the Event Manager hierarchy.</description>
+        <label>Share Published Events With Staff</label>
+        <sharedTo>
+            <roleAndSubordinates>Event_Manager</roleAndSubordinates>
+        </sharedTo>
+        <criteriaItems>
+            <field>Publication_Status__c</field>
+            <operation>equals</operation>
+            <value>Published</value>
+        </criteriaItems>
+    </sharingCriteriaRules>
+</SharingRules>

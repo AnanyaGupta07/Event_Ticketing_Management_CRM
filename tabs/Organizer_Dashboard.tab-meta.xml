@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Interactive dashboard for organizers to monitor event metrics, manage ticket quotas, and initiate event creation.</description>
+    <label>Organizer Dashboard</label>
+    <lwcComponent>organizerDashboard</lwcComponent>
+    <motif>Custom50: Big top</motif>
+</CustomTab>
