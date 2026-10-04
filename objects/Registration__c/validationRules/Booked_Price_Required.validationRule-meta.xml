@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Booked_Price_Required</fullName>
+    <active>true</active>
+    <description>Ensures Booked Price is locked in at registration creation.</description>
+    <errorConditionFormula>ISNEW() &amp;&amp; ISBLANK(Booked_Price__c)</errorConditionFormula>
+    <errorDisplayField>Booked_Price__c</errorDisplayField>
+    <errorMessage>Booked Price is required when creating a registration.</errorMessage>
+</ValidationRule>

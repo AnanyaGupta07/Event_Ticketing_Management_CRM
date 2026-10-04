@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Txn_Ref_Required_When_Successful</fullName>
+    <active>true</active>
+    <description>Ensures Transaction Reference is populated for any successful payment.</description>
+    <errorConditionFormula>ISPICKVAL(Payment_Status__c, &quot;Successful&quot;) &amp;&amp; ISBLANK(Transaction_Reference__c)</errorConditionFormula>
+    <errorDisplayField>Transaction_Reference__c</errorDisplayField>
+    <errorMessage>Transaction Reference is required when Payment Status is Successful.</errorMessage>
+</ValidationRule>

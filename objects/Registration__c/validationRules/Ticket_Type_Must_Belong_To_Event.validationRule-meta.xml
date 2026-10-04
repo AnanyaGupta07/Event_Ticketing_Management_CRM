@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Ticket_Type_Must_Belong_To_Event</fullName>
+    <active>true</active>
+    <description>Ensures the selected ticket type belongs to the parent event.</description>
+    <errorConditionFormula>Ticket_Type__r.Event__c &lt;&gt; Event__c</errorConditionFormula>
+    <errorDisplayField>Ticket_Type__c</errorDisplayField>
+    <errorMessage>The selected ticket type does not belong to the selected event.</errorMessage>
+</ValidationRule>

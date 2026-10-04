@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>No_Reg_On_Unpublished_Or_Closed_Event</fullName>
+    <active>true</active>
+    <description>Ensures registrations can only be created for events that are Open for registration.</description>
+    <errorConditionFormula>ISNEW() &amp;&amp; NOT(ISPICKVAL(Event__r.Registration_Status__c, &quot;Open&quot;))</errorConditionFormula>
+    <errorDisplayField>Registration_Status__c</errorDisplayField>
+    <errorMessage>Registrations cannot be created for events that are not currently open for registration.</errorMessage>
+</ValidationRule>
