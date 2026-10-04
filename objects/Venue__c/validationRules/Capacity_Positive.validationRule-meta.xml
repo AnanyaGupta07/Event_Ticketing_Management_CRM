@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Capacity_Positive</fullName>
+    <active>true</active>
+    <description>Ensures that Venue Capacity is strictly greater than zero.</description>
+    <errorConditionFormula>Venue_Capacity__c &lt;= 0</errorConditionFormula>
+    <errorDisplayField>Venue_Capacity__c</errorDisplayField>
+    <errorMessage>Venue Capacity must be a positive number greater than zero.</errorMessage>
+</ValidationRule>

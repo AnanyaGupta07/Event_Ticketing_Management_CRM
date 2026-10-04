@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Requires_Finance_Signoff__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Indicates whether exceeding manager limit requires Finance/CFO signoff.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Requires Finance Signoff</label>
+    <type>Checkbox</type>
+</CustomField>

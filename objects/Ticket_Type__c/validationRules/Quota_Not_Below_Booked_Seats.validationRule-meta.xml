@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Quota_Not_Below_Booked_Seats</fullName>
+    <active>true</active>
+    <description>Ensures quota cannot be reduced below the count of already booked seats.</description>
+    <errorConditionFormula>Quota__c &lt; Booked_Seats__c</errorConditionFormula>
+    <errorDisplayField>Quota__c</errorDisplayField>
+    <errorMessage>Ticket quota cannot be reduced below the number of already booked seats.</errorMessage>
+</ValidationRule>
